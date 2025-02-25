@@ -6,6 +6,6 @@ Most of extrapolation methods dedicated to the estimation of extreme risk measur
 
 ## Usage
 
-**Reference:** J. El Methni & S. Girard, "Approximate Bayesian Computation of reduced-bias extreme risk measures from heavy-tailed distributions", https://hal.inria.fr/hal-
+**Reference:** J. El Methni & S. Girard, "Approximate Bayesian Computation of reduced-bias extreme risk measures from heavy-tailed distributions", https://hal.inria.fr/hal-04965629
 
 ![image alt="image" width="20%" height="auto"](CTEflood.png)
