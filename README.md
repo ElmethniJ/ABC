@@ -8,4 +8,4 @@ Most of extrapolation methods dedicated to the estimation of extreme risk measur
 
 **Reference:** J. El Methni & S. Girard, "Approximate Bayesian Computation of reduced-bias extreme risk measures from heavy-tailed distributions", https://hal.inria.fr/hal-
 
-![image alt="image" width="20%" height="auto"](CTEflood.pdf)
+![image alt="image" width="20%" height="auto"](CTEflood.png)
