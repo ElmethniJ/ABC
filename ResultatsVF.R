@@ -1,8 +1,8 @@
-# Effacer tout
+# Remove all
 rm(list = ls())
 gc()
 
-# Packages utiles
+# Useful packages
 require(evir) 
 require(evt0)    
 require(invgamma) 
@@ -14,183 +14,189 @@ require(ggplot2)
 require(pracma)
 require(rmutil)
 
-# Module de creation des echantillons de reference 
+# Load reference sample creation program 
 source("CreationEchantillonsVF.R")
 
-# Fonction ABC
-source("FonctionABCvf.R")  # Nouvelle version VF
+# Load ABC function
+source("FonctionABCvf.R")
 
-# Taille de l echantillon
-n=500 # simulations
-# n=371 # besecura
-# n= 555 # flood
 
-# Nombre de replications
-N=1
-  
-# Ordre du quantile 
-pn=1/(2*n)  # Ordre du quantile
-# pn=1/n  # Ordre du quantile
-# pn=0.005    # Ordre du quantile
+# Step 1: choose sample size 
+# n=500   # to reproduce simulations results
+n=371     # for the real data set : besecura
+# n= 555  # for the real data set : flood
 
-# Facteur dextrapolation
+# Step 2: choose number of replications
+N=1    # for real data set
+#N=500  # to reproduce simulations results
+
+# Step 3: level of the quantile 
+# pn=1/(2*n)  # to reproduce simulations results
+pn=1/n        # for real data set
+# pn=0.005    # for real data set
+
+# Extrapolation factor
 dn=(2:(n-1))/(n*pn)
 
-# Fixe la seed
+# Set the seed
 set.seed(12)
 
-# Choisir une loi parmi les 6 en initialisant la variable : ChoixLoi  par un nombre entier de 1 a 7
-ChoixLoi=4	# Switch choix loi:  1=Loi du second ordre, 2=Burr,  3=Frechet, 4=Student, 5=Fisher, 6 InvGamma, 7=GPD
+# Step 4: choose one of the 7 distribution by initializing the variable ChoixLoi
+# 1=RPD, 2=Burr, 3=Frechet, 4=Student, 5=Fisher, 6 InvGamma, 7=GPD
+ChoixLoi=4	
 
-# Parametres Loi du second ordre  
-gammaSecond=1/2  
-RhoSecond=-1/2  
-betaSecond=1
+# Step 5: choose the parameters of the distribution
 
-# Parametres Loi de Burr
-gammaB=1/2    # Loi de Burr
-RhoB=-1/2  # rho, Loi de Burr
+# RPD parameters   
+gammaSecond=1/2 # gamma
+RhoSecond=-1/2  # rho
+betaSecond=1    # beta
 
-# Parametres Loi de Frechet
-gammaF=1/2       # Loi de Frechet implique Rho
-RhoF=-1           # rho, Loi de Frechet
+# Burr parameters
+gammaB=1/2  # gamma
+RhoB=-1/2   # rho
 
-# Parametres Loi de Student
-NuS=2            # Ddl de la Loi de Student
-gammaS=1/NuS     # Loi de Student
-RhoS=-2/NuS      # rho, Loi de Student
+# Frechet parameters
+gammaF=1/2  # gamma
+RhoF=-1     # rho fixed
 
-# Parametres Loi de Fisher
-NuF1=3            # Ddl1 de la Loi de Fisher
-NuF2=4            # Ddl2 de la Loi de Fisher
-gammaFi=2/NuF2        # Loi de Fisher
-RhoFi=-2/NuF2       # rho, Loi de Fisher
+# Student parameters
+NuS=2         # Degrees of freedom
+gammaS=1/NuS  # gamma
+RhoS=-2/NuS   # rho
 
-# Parametres Loi InvGamma
-BetaInvg=1      # ou 2, arbitraire ! determine le rate
-AlphaInvg=2     # AlphaInvg=-1/RhoInvg
-RhoInvg=-1/AlphaInvg
-gammaInvg=1/AlphaInvg
+# Fisher parameters
+NuF1=3           # First degrees of freedom
+NuF2=4           # Second degrees of freedom
+gammaFi=2/NuF2   # gamma
+RhoFi=-2/NuF2    # rho
 
-# Parametres Loi GPD
-RhoG=-1/2        # rho GPD
-gammaG=-RhoG       # Loi GPD
+# Inverse Gamma parameters
+BetaInvg=1      # Rate
+AlphaInvg=2     # Shape
+gammaInvg=1/AlphaInvg # gamma
+RhoInvg=-1/AlphaInvg  # rho 
+
+
+# GPD parameters
+RhoG=-1/2       # rho 
+gammaG=-RhoG    # gamma 
+
+
+#### not to be modified but must be executed even for real data ####
 
 LoiChoisie=function(choixLoi)
 {
   switch(choixLoi,"Second Ordre ","Burr ", "Frechet ", "Student","Fisher", "InvGamma","GPD")
 }
 
-loi=LoiChoisie(ChoixLoi)	# loi choisie
+loi=LoiChoisie(ChoixLoi)	# choosen distribution
 
 ChoixRho=function(choixLoi)
 {
   switch(choixLoi,RhoSecond,RhoB, RhoF, RhoS,RhoFi, RhoInvg,RhoG)
 }
 
-rho=ChoixRho(ChoixLoi)	# rho choisi
+rho=ChoixRho(ChoixLoi)	# choosen rho
 
 ChoixGamma=function(choixLoi)
 {
   switch(choixLoi,gammaSecond,gammaB, gammaF, gammaS,gammaFi, gammaInvg,gammaG)
 }
 
-gamma=ChoixGamma(ChoixLoi)	# gamma choisi
+gamma=ChoixGamma(ChoixLoi)	# choosen gamma
 
-# Matrice des N echantillons de taille n
+# Creation of the matrix of N samples of size n
 ListeRetour=FonctCreerEch(ChoixLoi)
-Reference=ListeRetour[[1]] 
-# Reference      # Matrice de N lignes (Nb echantillons) et n colonnes (taille echantillons)
+Reference=ListeRetour[[1]] # Matrix of N rows and n columns
 QuantTheo=ListeRetour[[2]]
-QuantTheo      # Quantile theorique auquel se comparer
+QuantTheo      # Theoretical quantile to compare with
+
+#### end ####
 
 
-# Real Data pour tester 
-# Ne pas oublier de changer le n avant
+### Start : for simulations do not execute this section 
+
+#### For real Data #### 
+# Step 6 : choose the real data set
 
 # Besecura article Weissman
-# require(CASdatasets)
-# data("besecura")
-# n=length(besecura$Loss)
-# Reference=matrix(0,nr=N,nc=n)	# matrice des N(=1) echantillons de taille n
-# Reference[N,]=besecura$Loss
+require(CASdatasets)
+data("besecura")
+n=length(besecura$Loss)
+Reference=matrix(0,nr=N,nc=n)
+Reference[N,]=besecura$Loss
+
+# Uncomment lines 130 to 134 if you want to execute on flood
 
 # Flood article Expected Shortfall
 # library(Expectrem)
 # data("flood_data")
 # n=length(flood_data$Area_A_2012)
-# Reference=matrix(0,nr=N,nc=n)	# matrice des N(=1) echantillons de taille n
+# Reference=matrix(0,nr=N,nc=n)
 # Reference[N,]=flood_data$Area_A_2012
 
-# dn=(2:(n-1))/(n*pn)
-# QuantTheo=max(Reference) 
-# QuantTheo=quantile(Reference[1,],1-pn)
-# CTETheo=mean(Reference[Reference>QuantTheo])
-# CTETheo
+dn=(2:(n-1))/(n*pn)
 
-############################### Procedure ###############################
- # _______________________________________________________________________
-# Procedure pour choisir le quantile theorique selon une loi choisie
+# Step 6 bis: be vigilant on the level of the quantile to compare with
+QuantTheo=max(Reference) # if pn=1/n
+# QuantTheo=quantile(Reference[1,],1-pn) # if pn=0.005
+CTETheo=mean(Reference[Reference>QuantTheo])
+CTETheo
 
-# Attention pour ces deux listes qui vont de 1 a n-2 correspond a k qui va de  2 a n-1
+### End
 
-# Arguments Fonction ABC
-# RefCour : echantillon de reference auquel se comparer
-# alphan : ordre du quantile 
-# M:  Nombre d'echantillons a tirer pour une taille fixee
-# tau : Pourcentage d'echantillons a garder
-# sigmaR : ecart-type de la loi gamma a priori sur rho
-# sigmaB : ecart-type de la loi gamma a priori sur beta
+############################### ABC procedure ###############################
 
-############### Boucle sur le nombre N de replications (d echantillons) ###############################
+# Caution for these two lists which go from 1 to n-2 corresponds to k which goes from 2 to n-1
 
-# MatGamHill=matrix(0,nr=N,nc=n-2)     # matrice des N vecteurs des estimations des k Gamma par Hill
-# MatGamGomes=matrix(0,nr=N,nc=n-2)    # matrice des N vecteurs des estimations des k Gamma par Gomes
-# MatGamPWM0=matrix(0,nr=N,nc=n-2)     # matrice des N vecteurs des estimations des k Gamma par PWM0
-# MatGamPWM1=matrix(0,nr=N,nc=n-2)     # matrice des N vecteurs des estimations des k Gamma par PWM1
-# MatGamPWM2=matrix(0,nr=N,nc=n-2)     # matrice des N vecteurs des estimations des k Gamma par PWM2
-# MatGamR=matrix(0,nr=N,nc=n-2)        # matrice des N vecteurs des estimations des k Gamma corrigees ??
-# MatGammaPWM=matrix(0,nr=N,nc=n-2)    # matrice des N vecteurs des estimations des k Gamma par PWM
-# MatBetaPWM=matrix(0,nr=N,nc=n-2)     # matrice des N vecteurs des estimations des k Beta par PWM
-# MatRhoPWM=matrix(0,nr=N,nc=n-2)      # matrice des N vecteurs des estimations des k Rho par PWM
-MatQGomes=matrix(0,nr=N,nc=n-2)        # matrice des N vecteurs des estimations des k QGomez par Gomes
-MatQWeiss=matrix(0,nr=N,nc=n-2)        # matrice des N vecteurs des estimations des k QWeiss par Weiss
-MatQPWM=matrix(0,nr=N,nc=n-2)          # matrice des N vecteurs des estimations des k QGomez par PWM
-MatQABC=matrix(0,nr=N,nc=n-2)          # matrice des N vecteurs des estimations des k QABC par ABC
-MatCTEABC=matrix(0,nr=N,nc=n-2)          # matrice des N vecteurs des estimations des k QABC par ABC
+# Arguments of the ABC function 
 
-for(Nrep in 1:N)	# Debut boucle sur le nombre N de replications
+# RefCour : reference sample for comparison
+# alphan : level of the quantile 
+# n : fixed size of samples to be drawn
+# M:  number of samples to be drawn for a fixed size
+# tau : percentage of samples to be retained
+# sigmaR : standard deviation of the a priori gamma distribution on rho
+# sigmaB : standard deviation of gamma distribution a priori on beta
+
+############### Loop over the number N of replications ###############################
+
+MatQGomes=matrix(0,nr=N,nc=n-2) # Matrix initialization of N vectors of k QGomez estimates by Gomes
+MatQWeiss=matrix(0,nr=N,nc=n-2) # Matrix initialization of N vectors of k QWeiss estimates by Weiss 
+MatQPWM=matrix(0,nr=N,nc=n-2)   # Matrix initialization of N vectors of k QPWM estimates by PWM
+MatQABC=matrix(0,nr=N,nc=n-2)   # Matrix initialization of N vectors of k QABC estimates by ABC
+MatCTEABC=matrix(0,nr=N,nc=n-2) # Matrix initialization of N vectors of k CTEABC estimates by ABC
+
+for(Nrep in 1:N)# Start loop on number N of replications
 { 
-  LseuilBis=NULL     # Reinitialiser le vecteur des n-2 seuils 
-  LexcesBis=list()   # Reinitialiser la liste de n-2  vecteurs  de taille croissante de 2 a n-1 
-  LabcBis=list()     # Reinitialiser la liste de n-2  dataframe Gamma, Rho, Beta, Delta, QuantileABC
-  EstimHill=NULL     # Reinitialiser le vecteur des n-2 estimations de Hill
-  EstimGomes=NULL    # Reinitialiser le vecteur des n-2 estimations de Gomes
-  EstimPWM0=NULL     # Reinitialiser le vecteur des n-2 estimations de PWM0  
-  EstimPWM1=NULL     # Reinitialiser le vecteur des n-2 estimations de PWM1 
-  EstimPWM2=NULL     # Reinitialiser le vecteur des n-2 estimations de PWM2 
-  EstimR=NULL        # Reinitialiser le vecteur des n-2 estimations du ratio des moments
-  GammaPWM=NULL      # Reinitialiser le vecteur des n-2 estimations de GammaPWM
-  BetaPWM=NULL       # Reinitialiser le vecteur des n-2 estimations de BetaPWM 
-  RhoPWM=NULL        # Reinitialiser le vecteur des n-2 estimations de RhoPWM
-  QGomes=NULL        # Reinitialiser le vecteur des n-2 estimations de QGomes
-  QWeiss=NULL        # Reinitialiser le vecteur des n-2 estimations de QWeiss
-  QPWM=NULL          # Reinitialiser le vecteur des n-2 estimations de QPWM
+  LseuilBis=NULL     # Reset the vector of thresholds
+  LexcesBis=list()   # Rest the list of excesses 
+  LabcBis=list()     # Reset the dataframe which contains Gamma, Rho, Beta, Delta, QuantileABC
+  EstimHill=NULL     # Reset the vector of Hill estimations
+  EstimGomes=NULL    # Reset the vector of Gomes estimations
+  EstimPWM0=NULL     # Reset the vector of PWM0 estimations 
+  EstimPWM1=NULL     # Reset the vector of PWM1 estimations 
+  EstimPWM2=NULL     # Reset the vector of PWM2 estimations 
+  EstimR=NULL        # Reset the vector of moments ratio estimations 
+  GammaPWM=NULL      # Reset the vector of GammaPWM estimations
+  BetaPWM=NULL       # Reset the vector of BetaPWM estimations
+  RhoPWM=NULL        # Reset the vector of RhoPWM estimations
+  QGomes=NULL        # Reset the vector of QGomes estimations
+  QWeiss=NULL        # Reset the vector of QWeiss estimations
+  QPWM=NULL          # Reset the vector of QPWM estimations
   MeanQbis=NULL      # Reinitialiser le vecteur des n-2 estimations des moyennes des quantiles sans les seuils
   MeanLogQbis=NULL   # Reinitialiser le vecteur des n-2 estimations des moyennes des logquantiles avec les seuils
   
-  RefCour=Reference[Nrep,]    # Reference Courant de numero : Nrep de 1 a N
+  RefCour=Reference[Nrep,] # Reference Courant de numero : Nrep de 1 a N
 
-  
-# Gamma Hill et Gomes 
-# EstimHill=as.vector(unlist(lapply(2:(n-1), function(i) mean(log(LexcesBis[[i-1]])))))
-RhoChap=mop(RefCour,p=0,k=1,"RBMOP")$rho    # Calcul RhoChap pour Gomes
-BetaChap=mop(RefCour,p=0,k=1,"RBMOP")$beta   # Calcul BetaChap  pour Gomes
-EstimHill=sapply(2:(n-1), function(i) GammaHill(RefCour,i))   # Calcul des n-2 estimations de gamma par Hill
-# MatGamHill[Nrep,]=EstimHill   # Stoker le vecteur des estimations de gamma par Hill pour l echantillon courant
-EstimGomes=EstimHill*(1-((BetaChap*(dn*pn)^(-RhoChap))/(1-RhoChap)))   # Calcul des n-2 estimations de gamma par Gomes
-# MatGamGomes[Nrep,]=EstimGomes  # Stoker le vecteur des estimations de gamma par Gomes pour l echantillon courant
-  
+
+# Estimation of Gamma for Hill and CH 
+RhoChap=mop(RefCour,p=0,k=1,"RBMOP")$rho   # Estimation of rho 
+BetaChap=mop(RefCour,p=0,k=1,"RBMOP")$beta # Estimation of beta 
+EstimHill=sapply(2:(n-1), function(i) GammaHill(RefCour,i))          # Hill estimation
+EstimGomes=EstimHill*(1-((BetaChap*(dn*pn)^(-RhoChap))/(1-RhoChap))) # CH estimation
+
   
 # Calcul les k (de 2 a n-1) seuils, les exces correspondants et ABC sur les exces pour RefCour = Reference Courant (1 echantillon)
 LseuilBis=sapply(2:(n-1), function(i) Seuil(RefCour,i))
