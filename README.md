@@ -1,14 +1,11 @@
-# Shrinkage for Extreme Partial Least-Squares (SEPaLS)
+# Approximate Bayesian Computation of reduced-bias extreme risk measures from heavy-tailed distributions
 
-R package to Compute Shrinkage for Extreme Partial Least-Squares (SEPaLS) estimators, an adaptation of the original Partial Least Squares (PLS) method tailored to the extreme-value framework. 
+## Abstract
 
-Now on the CRAN, please use the following to install the CRAN version:
-```{r}
-install.packages("SEPaLS")
-```
+Most of extrapolation methods dedicated to the estimation of extreme risk measures rely on the approximation of the excesses distribution above a high threshold by a Generalized Pareto Distribution (GPD). We propose an alternative to the GPD, called the Refined Pareto Distribution (RPD), which allows for a second-order approximation of the excesses distribution. The parameters of the RPD are estimated using an Approximate Bayesian Computation (ABC) method, and reduced-bias estimators of extreme risk measures are then derived together with the associated credible intervals. The ABC estimator demonstrates impressive performance over a wide range of heavy-tailed distributions. Its usefulness is also illustrated on two data sets of insurance claims.
 
-Joint work by Stéphane Girard, Hadrien Lorenzo and Julyan Arbel.
+## Usage
 
-R code to replicate the results of the paper is available at https://github.com/hlorenzo/SEPaLS_simus.
+**Reference:** J. El Methni & S. Girard, "Approximate Bayesian Computation of reduced-bias extreme risk measures from heavy-tailed distributions", https://hal.inria.fr/hal-
 
 ![image alt="image" width="20%" height="auto"](images/sparse_prior_3d_triplette.png)
