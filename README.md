@@ -49,7 +49,7 @@ If you are interested in log-Expected Shortfall  estimation pn=0.5\%
 Move to line 470 to reproduce the figures of the paper for the Besecura case    
 Move to line 550 to reproduce the figures for the OpenFEMA case  
 
-### The current code is designed to reproduced the case Besecura with pn=1/n
+#### The current code is designed to reproduce the OpenFEMA case with pn=0.5\% as illustrated by the figure below
 
 **Reference:** J. El Methni & S. Girard, "Approximate Bayesian Computation of reduced-bias extreme risk measures from heavy-tailed distributions", https://hal.inria.fr/hal-04965629
 
