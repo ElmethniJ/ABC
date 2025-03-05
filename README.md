@@ -29,8 +29,15 @@ Or load the estimations:
 - Move directly to line 317 and load the corresponding matrices of estimations
 
 Then:
-- Execute from line 327 to 470 to reproduce the tables and the figures of the simulations part
+- Execute from line 327 to 360 to compute the MSE
+
+#### To reproduce the figures 
+- To reproduce the figures of the paper (and the ones of the supplementary material) execute lines 360--400
 - With the exception of the figure on the 90\% credible intervals associated with the ABC estimator which have to be computed on the first replication (main loop with N=1)
+
+#### To reproduce the tables
+- To reproduce the tables corresponding to the MRMSE1 given in the supplementary material execute lines 406--409
+- To reproduce the tables corresponding to the MRMSE2 given in the paper execute lines 410--465
 
 ### To reproduce the real data set part
 
