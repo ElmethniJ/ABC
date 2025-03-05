@@ -23,8 +23,8 @@ source("FunctionABC.R")
 
 # Step 1: choose sample size n
 # n=500   # to reproduce simulations results
-n=371     # for the real data set : besecura
-# n= 555  # for the real data set : flood
+# n=371     # for the real data set : besecura
+n= 555  # for the real data set : flood
 
 # Step 2: choose number of replications N
 N=1    # for real data set
@@ -32,8 +32,8 @@ N=1    # for real data set
 
 # Step 3: choose level of the quantile pn
 # pn=1/(2*n)  # to reproduce simulations results
-pn=1/n        # for real data set
-# pn=0.005    # for real data set
+# pn=1/n        # for real data set
+pn=0.005    # for real data set
 
 # Extrapolation factor dn
 dn=(2:(n-1))/(n*pn)
@@ -119,24 +119,24 @@ QuantTheo
 # Step 6: choose the real data set
 
 # Besecura article Weissman
-require(CASdatasets)
-data("besecura")
-n=length(besecura$Loss)
-Reference=matrix(0,nr=N,nc=n)
-Reference[N,]=besecura$Loss
+# require(CASdatasets)
+# data("besecura")
+# n=length(besecura$Loss)
+# Reference=matrix(0,nr=N,nc=n)
+# Reference[N,]=besecura$Loss
 
 # Uncomment lines 130 to 134 if you want to execute on flood
 
 # Flood article Expected Shortfall
-# library(Expectrem)
-# data("flood_data")
-# n=length(flood_data$Area_A_2012)
-# Reference=matrix(0,nr=N,nc=n)
-# Reference[N,]=flood_data$Area_A_2012
+library(Expectrem)
+data("flood_data")
+n=length(flood_data$Area_A_2012)
+Reference=matrix(0,nr=N,nc=n)
+Reference[N,]=flood_data$Area_A_2012
 
 # Step 6 bis: be vigilant on the level of the quantile to compare with
-QuantTheo=max(Reference) # if pn=1/n
-# QuantTheo=quantile(Reference[1,],1-pn) # if pn=0.005
+# QuantTheo=max(Reference) # if pn=1/n
+QuantTheo=quantile(Reference[1,],1-pn) # if pn=0.005
 CTETheo=mean(Reference[Reference>QuantTheo])
 CTETheo
 
